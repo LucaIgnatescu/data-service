@@ -40,7 +40,18 @@ This is a Next.js 15 application using the App Router architecture with the foll
 ## Development Guidelines
 
 - Always make sure your memory is updated with the latest documentation before starting to code. Google it if not. Adhere to this rule strictly.
+- When I ask for ideas, do not give me a complete technical overview. Just high level feature discussion. I am interested in functionality, not implementation, unless otherwise specified.
 
 ## Git Guidelines
 
 - Write short git commit messages. Do not add the written with claude stuff. Make them as brief as possible.
+
+
+## Features
+
+- Define custom tabular schemas. 
+- Use natural language to define these schemas.
+- Ingest data: record by record or as csv.
+- Run notebooks to analyze the data.
+- Use natural language to write them.
+- Present results in a user friendly way. 
