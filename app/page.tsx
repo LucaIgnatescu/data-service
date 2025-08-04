@@ -1,9 +1,6 @@
-import { DataGrid } from "@/app/client";
-
 export default function Home() {
   return (
-    <div>
-      <DataGrid />
+    <div className="flex items-center justify-center min-h-screen">
     </div>
   );
 }
