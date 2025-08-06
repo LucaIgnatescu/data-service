@@ -1,11 +1,6 @@
-"use client";
-
 import { CheckIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { Select } from "radix-ui";
-import { useState } from "react";
-
-
-
+import { ChangeEventHandler, useState } from "react";
 
 function SelectionItem({ value, text }: { value: string; text: string }) {
   return (
@@ -18,7 +13,7 @@ function SelectionItem({ value, text }: { value: string; text: string }) {
 
 type SQLColumnType = "INT" | "TEXT" | "REAL" | "BLOB";
 
-export function ColumnType() {
+export function ColumnType({ onValueChange, className }: { onValueChange: (arg0: string) => void; className: string }) {
   const typeOptions = [
     {
       text: "integer",
@@ -39,9 +34,9 @@ export function ColumnType() {
   ];
 
   return (
-    <Select.Root onValueChange={console.log}>
+    <Select.Root onValueChange={onValueChange}>
       <Select.Trigger
-        className="border rounded border-neutral-400 flex flex-row justify-between align-middle text-stone-100 p-1 data-[placeholder]:text-neutral-500 focus:outline-none focus:shadow-none min-w-20 self-center"
+        className={className}
       >
         <Select.Value placeholder="Column Type" />
         <Select.Icon className="align-middle self-center inline-block ml-2"><ChevronUpIcon /></Select.Icon>
@@ -59,15 +54,37 @@ export function ColumnType() {
   );
 }
 
-export function SelectionRow() {
-  const [defaultVal, setDefaultVal] = useState<string>("");
+type DBColumnInputProps = {
+  onValueChange: (arg0: string) => void;
+  onInputChange: ChangeEventHandler<HTMLInputElement>;
+};
+
+export function DBColumnInput({
+  onValueChange,
+  onDefaultValueChange,
+  onColumnNameChange,
+  columnName,
+  defaultValue,
+}: {
+  onValueChange: (arg0: string) => void;
+  onDefaultValueChange: ChangeEventHandler<HTMLInputElement>;
+  onColumnNameChange: ChangeEventHandler<HTMLInputElement>;
+  columnName: string;
+  defaultValue: string;
+}) {
   return (
-    <div className="flex justify-between">
-      <ColumnType />
+    <div className="flex justify-between w-full">
+      <input
+        placeholder="column name"
+        value={columnName}
+        onChange={onColumnNameChange}
+        className="border rounded p-1 min-w-5 border-stone-400 h-10"
+      />
+      <ColumnType onValueChange={onValueChange} className="border rounded border-neutral-400 flex flex-row justify-between align-middle text-stone-100 p-1 data-[placeholder]:text-neutral-500 focus:outline-none focus:shadow-none min-w-20 self-center" />
       <input
         placeholder="default value"
-        value={defaultVal}
-        onChange={e => setDefaultVal(e.target.value)}
+        value={defaultValue}
+        onChange={onDefaultValueChange}
         className="border rounded p-1 min-w-5 border-stone-400"
       />
 
@@ -78,7 +95,64 @@ export function SelectionRow() {
 export function DBColumns() {
   type DBColumnInfo = {
     name: string;
-    type: SQLColumnType;
+    type: SQLColumnType | null;
+    index: number;
+    defaultValue: string;
+  };
+  const [counter, setCounter] = useState(0);
+  const [dbColumns, setDbColumns] = useState<DBColumnInfo[]>([]);
 
-  }
+  const addColumn = () => {
+    const newColumn = {
+      name: "",
+      type: null,
+      index: counter,
+      defaultValue: "",
+    };
+    setCounter(counter + 1);
+    setDbColumns([...dbColumns, newColumn]);
+  };
+
+  const updateDBColumnFactory = (index: number) => {
+    const onValueChange = (value: string) => {
+      const newCol = { ...dbColumns[index], type: value as SQLColumnType };
+      setDbColumns([...dbColumns.slice(0, index), newCol, ...dbColumns.slice(index + 1)]);
+    };
+
+    const onDefaultValueChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+      const newCol = { ...dbColumns[index], defaultValue: e.target.value };
+      setDbColumns([...dbColumns.slice(0, index), newCol, ...dbColumns.slice(index + 1)]);
+    };
+
+    const onColumnNameChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+      const newCol = { ...dbColumns[index], name: e.target.value };
+      setDbColumns([...dbColumns.slice(0, index), newCol, ...dbColumns.slice(index + 1)]);
+    };
+
+    return { onValueChange, onDefaultValueChange, onColumnNameChange };
+  };
+
+  return (
+    <div className="space-y-2">
+      {dbColumns.map((col, index) => {
+        const handlers = updateDBColumnFactory(index);
+        return (
+          <DBColumnInput
+            key={col.index}
+            onValueChange={handlers.onValueChange}
+            onDefaultValueChange={handlers.onDefaultValueChange}
+            onColumnNameChange={handlers.onColumnNameChange}
+            columnName={col.name}
+            defaultValue={col.defaultValue}
+          />
+        );
+      })}
+      <button
+        onClick={addColumn}
+        className="border rounded p-2 bg-blue-600 text-white hover:bg-blue-700"
+      >
+        Add Column
+      </button>
+    </div>
+  );
 }

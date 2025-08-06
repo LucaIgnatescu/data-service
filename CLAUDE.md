@@ -36,6 +36,7 @@ This is a Next.js 15 application using the App Router architecture with the foll
 - TypeScript with strict configuration
 - Tailwind CSS v4 for styling
 - ESLint with Next.js configuration
+- Radix UI - Use `import { Select } from "radix-ui";` syntax (not the older `@radix-ui/react-select` imports)
 
 ## Development Guidelines
 
