@@ -2,6 +2,10 @@
 
 import { CheckIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { Select } from "radix-ui";
+import { useState } from "react";
+
+
+
 
 function SelectionItem({ value, text }: { value: string; text: string }) {
   return (
@@ -12,7 +16,9 @@ function SelectionItem({ value, text }: { value: string; text: string }) {
   );
 }
 
-export function ColumnTy() {
+type SQLColumnType = "INT" | "TEXT" | "REAL" | "BLOB";
+
+export function ColumnType() {
   const typeOptions = [
     {
       text: "integer",
@@ -35,7 +41,7 @@ export function ColumnTy() {
   return (
     <Select.Root onValueChange={console.log}>
       <Select.Trigger
-        className="border rounded border-neutral-400 flex flex-row justify-between align-middle text-stone-300 p-1 data-[placeholder]:text-neutral-500 focus:outline-none focus:shadow-none min-w-20"
+        className="border rounded border-neutral-400 flex flex-row justify-between align-middle text-stone-100 p-1 data-[placeholder]:text-neutral-500 focus:outline-none focus:shadow-none min-w-20 self-center"
       >
         <Select.Value placeholder="Column Type" />
         <Select.Icon className="align-middle self-center inline-block ml-2"><ChevronUpIcon /></Select.Icon>
@@ -53,5 +59,26 @@ export function ColumnTy() {
   );
 }
 
+export function SelectionRow() {
+  const [defaultVal, setDefaultVal] = useState<string>("");
+  return (
+    <div className="flex justify-between">
+      <ColumnType />
+      <input
+        placeholder="default value"
+        value={defaultVal}
+        onChange={e => setDefaultVal(e.target.value)}
+        className="border rounded p-1 min-w-5 border-stone-400"
+      />
 
-function 
+    </div>
+  );
+}
+
+export function DBColumns() {
+  type DBColumnInfo = {
+    name: string;
+    type: SQLColumnType;
+
+  }
+}
