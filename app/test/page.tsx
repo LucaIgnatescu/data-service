@@ -2,12 +2,8 @@ import Boundary from "./Boundary";
 
 export default function Page() {
   return (
-    <div className="w-screen h-screen flex flex-col justify-center">
-      <div className="h-1/3 w-full flex flex-row justify-center">
-        <div className="w-1/3 h-full">
-          <Boundary />
-        </div>
-      </div>
+    <div className="m-10 bg-neutral-900">
+      <Boundary />
     </div>
   );
 }

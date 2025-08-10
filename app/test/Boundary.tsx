@@ -1,7 +1,7 @@
 "use client";
 
-import { DBColumnInput } from "@/components/client";
+import { DBColumnInput, DBColumns } from "@/components/client";
 
 export default function Boundary() {
-  return <DBColumnInput />;
+  return <DBColumns />;
 }

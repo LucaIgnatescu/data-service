@@ -4,7 +4,7 @@ import { ChangeEventHandler, useState } from "react";
 
 function SelectionItem({ value, text }: { value: string; text: string }) {
   return (
-    <Select.Item value={value} className="rounded p-1 flex flex-row w-full min-w-10  justify-between data-[state=checked]:bg-neutral-600 focus:outline-none focus:bg-neutral-800">
+    <Select.Item value={value} className="rounded p-1 flex flex-row w-full min-w-30  justify-between data-[state=checked]:bg-neutral-600 focus:outline-none hover:bg-neutral-700">
       <Select.ItemText>{text}</Select.ItemText>
       <Select.ItemIndicator className="self-center ml-10"><CheckIcon /></Select.ItemIndicator>
     </Select.Item>
@@ -44,7 +44,7 @@ export function ColumnType({ onValueChange, className }: { onValueChange: (arg0:
       </Select.Trigger>
 
       <Select.Portal>
-        <Select.Content position="popper" side="top" className="border-stone-800 border p-1 rounded ">
+        <Select.Content position="popper" side="bottom" className="border-neutral-800 border p-1 rounded bg-neutral-900">
           <Select.Viewport>
             {typeOptions.map(typeOpt => <SelectionItem key={typeOpt.value} {...typeOpt} />)}
           </Select.Viewport>
@@ -73,19 +73,19 @@ export function DBColumnInput({
   defaultValue: string;
 }) {
   return (
-    <div className="flex justify-between w-full">
+    <div className="flex justify-between w-full h-10">
       <input
         placeholder="column name"
         value={columnName}
         onChange={onColumnNameChange}
-        className="border rounded p-1 min-w-5 border-stone-400 h-10"
+        className="border rounded p-1 min-w-5 border-neutral-400 h-full focus:outline-none"
       />
-      <ColumnType onValueChange={onValueChange} className="border rounded border-neutral-400 flex flex-row justify-between align-middle text-stone-100 p-1 data-[placeholder]:text-neutral-500 focus:outline-none focus:shadow-none min-w-20 self-center" />
+      <ColumnType onValueChange={onValueChange} className="border rounded border-neutral-400 flex flex-row justify-between items-center text-neutral-100 p-1 data-[placeholder]:text-neutral-500 focus:outline-none focus:shadow-none min-w-20 self-center h-full text-center" />
       <input
         placeholder="default value"
         value={defaultValue}
         onChange={onDefaultValueChange}
-        className="border rounded p-1 min-w-5 border-stone-400"
+        className="border rounded p-1 min-w-5 border-neutral-400 h-full focus:outline-none"
       />
 
     </div>
@@ -149,7 +149,7 @@ export function DBColumns() {
       })}
       <button
         onClick={addColumn}
-        className="border rounded p-2 bg-blue-600 text-white hover:bg-blue-700"
+        className="border rounded p-2 text-white hover:bg-neutral-600"
       >
         Add Column
       </button>
