@@ -56,3 +56,4 @@ This is a Next.js 15 application using the App Router architecture with the foll
 - Run notebooks to analyze the data.
 - Use natural language to write them.
 - Present results in a user friendly way. 
+- Use double quotes for strings

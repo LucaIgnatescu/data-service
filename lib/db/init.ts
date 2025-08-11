@@ -1,61 +1,61 @@
-import sqlite3 from "sqlite3";
-import path from "path";
-import fs from "fs";
+import postgres from "postgres";
 
-const DB_PATH = path.join(process.cwd(), "data.db");
+export type SQLColumnType = "INT" | "TEXT" | "REAL" | "BLOB";
 
-let db: sqlite3.Database | null = null;
+export type DBColumnInfo = {
+  name: string;
+  type: SQLColumnType;
+  defaultValue: string;
+};
 
-export function initializeDatabase(): Promise<sqlite3.Database> {
-  return new Promise((resolve, reject) => {
-    if (db) {
-      resolve(db);
-      return;
+export type DBInfo = {
+  name: string;
+  columns: DBColumnInfo[];
+};
+
+const dbUrl = process.env.DB_URL || "";
+const dbPwd = process.env.DB_PWD || "";
+
+const projectId = dbUrl.replace("https://", "").replace(".supabase.co", "");
+const connectionString = `postgresql://postgres.${projectId}:${dbPwd}@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;
+
+let sql: ReturnType<typeof postgres> | null = null;
+
+export const sanitizeString = (input: string): string => {
+  return input.replace(/[^a-zA-Z0-9_\-\s()]/g, "");
+};
+
+export const createTableQuery = (info: DBInfo) => {
+  const name = sanitizeString(info.name);
+  const columns = info.columns.map(({ name, type, defaultValue }) => {
+    if (defaultValue === "") {
+      return `${sanitizeString(name)} ${sanitizeString(type)}`;
     }
+    return `${sanitizeString(name)} ${sanitizeString(type)} DEFAULT ${sanitizeString(defaultValue)}`;
+  }).join(", ");
 
-    // Check if database file exists
-    if (!fs.existsSync(DB_PATH)) {
-      reject(new Error(`Database file not found at: ${DB_PATH}`));
-      return;
-    }
+  return `CREATE TABLE ${sanitizeString(name)} (${columns});`;
+};
 
-    db = new sqlite3.Database(DB_PATH, (err) => {
-      if (err) {
-        console.error("Error opening database:", err.message);
-        reject(err);
-        return;
-      }
+export const createTable = async (info: DBInfo) => {
+  const db = getDB();
+  const query = createTableQuery(info);
 
-      console.log("Connected to SQLite database at:", DB_PATH);
-      resolve(db!);
-    });
-  });
-}
-
-export function getDatabase(): sqlite3.Database {
-  if (!db) {
-    throw new Error("Database not initialized. Call initializeDatabase() first.");
+  try {
+    await db.unsafe(query);
+    return { success: true };
   }
-  return db;
-}
 
-export function closeDatabase(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (!db) {
-      resolve();
-      return;
-    }
+  catch (error) {
+    console.error("Error creating table:", error);
+    return { success: false, error };
+  }
+};
 
-    db.close((err) => {
-      if (err) {
-        console.error("Error closing database:", err.message);
-        reject(err);
-        return;
-      }
-
-      console.log("Database connection closed.");
-      db = null;
-      resolve();
-    });
-  });
-}
+export const getDB = () => {
+  if (sql !== null) {
+    return sql;
+  }
+  sql = postgres(connectionString);
+  return sql;
+};

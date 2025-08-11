@@ -1,6 +1,7 @@
 import { CheckIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { Select } from "radix-ui";
 import { ChangeEventHandler, useState } from "react";
+import { SQLColumnType, DBColumnInfo } from "@/lib/db/init";
 
 function SelectionItem({ value, text }: { value: string; text: string }) {
   return (
@@ -10,8 +11,6 @@ function SelectionItem({ value, text }: { value: string; text: string }) {
     </Select.Item>
   );
 }
-
-type SQLColumnType = "INT" | "TEXT" | "REAL" | "BLOB";
 
 export function ColumnType({ onValueChange, className }: { onValueChange: (arg0: string) => void; className: string }) {
   const typeOptions = [
@@ -93,14 +92,14 @@ export function DBColumnInput({
 }
 
 export function DBColumns() {
-  type DBColumnInfo = {
-    name: string;
+  type ColumnListItem = Omit<DBColumnInfo, "type"> & {
     type: SQLColumnType | null;
     index: number;
-    defaultValue: string;
   };
+
   const [counter, setCounter] = useState(0);
-  const [dbColumns, setDbColumns] = useState<DBColumnInfo[]>([]);
+
+  const [dbColumns, setDbColumns] = useState<ColumnListItem[]>([]);
 
   const addColumn = () => {
     const newColumn = {
