@@ -13,11 +13,8 @@ export type DBInfo = {
   columns: DBColumnInfo[];
 };
 
-const dbUrl = process.env.DB_URL || "";
 const dbPwd = process.env.DB_PWD || "";
-
-const projectId = dbUrl.replace("https://", "").replace(".supabase.co", "");
-const connectionString = `postgresql://postgres.${projectId}:${dbPwd}@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;
+const connectionString = `postgresql://postgres:${dbPwd}@db.ngkvguukkyxthcfkikqc.supabase.co:5432/postgres`;
 
 let sql: ReturnType<typeof postgres> | null = null;
 
