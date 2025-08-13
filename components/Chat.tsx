@@ -3,14 +3,14 @@
 import { MessageParam } from "@anthropic-ai/sdk/resources";
 import { useState } from "react";
 import { z } from "zod";
+import { ChatBox } from "./Chatbox";
 
 const textMessageSchema = z.object({
-
   role: z.enum(["user", "assistant"]),
   content: z.string(),
-},
+});
 
-);
+export type Role = "user" | "assistant";
 
 export type TextMessageSchema = z.infer<typeof textMessageSchema>;
 
@@ -20,177 +20,21 @@ export default function Chat() {
       role: "user",
       content: "hello",
     },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
-    {
-      role: "user",
-      content: "hello",
-    },
-    {
-      role: "assistant",
-      content: "hello",
-    },
   ]);
-  return (
-    <div className="w-full h-full overflow-y-auto max-h-96">
-      {messages.map((message, i) => message.role === "user"
-        ? <UserMessage text={message.content} key={i} />
-        : <BotMessage text={message.content} key={i} />)}
 
+  const addMessage = (message: string, role: Role) => {
+    setMessages(messages => [...messages, { role, content: message }]);
+  };
+
+  return (
+    <div className="w-full h-full">
+      <div>
+        {messages.map((message, i) => message.role === "user"
+          ? <UserMessage text={message.content} key={i} />
+          : <BotMessage text={message.content} key={i} />)}
+
+      </div>
+      <ChatBox addMessage={addMessage} />
     </div>
   );
 }
