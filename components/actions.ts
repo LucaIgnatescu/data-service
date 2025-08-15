@@ -1,10 +1,16 @@
 "use server";
 
+import Anthropic from "@anthropic-ai/sdk";
 import { TextMessage } from "./Chat";
 
-export async function callAgent(conversation: TextMessage[]) {
-  console.log("running on server");
-  await new Promise(res => setTimeout(res, 2000));
+const anthropic = new Anthropic();
 
-  return Promise.resolve("agent response");
+export async function callAgent(conversation: TextMessage[]) {
+  const response = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 2048,
+    messages: conversation,
+  });
+  console.log(response);
+  return response.content;
 }

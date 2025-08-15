@@ -22,8 +22,14 @@ export default function Chat() {
     const conversation = [...prev, { role: "user", content: message }] as TextMessage[];
     try {
       const response = await callAgent(conversation);
+      if (response === null) {
+        setError(true);
+        return prev;
+      }
+      const text = response[0].text as string;
+      console.log(text);
 
-      conversation.push({ role: "assistant", content: response });
+      conversation.push({ role: "assistant", content: text });
       return conversation;
     }
     catch (err) {
