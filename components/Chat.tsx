@@ -1,35 +1,25 @@
 "use client";
 
 import { useActionState, useOptimistic, useState } from "react";
-import { z } from "zod";
 import { callAgent } from "./actions";
-
-const textMessageSchema = z.object({
-  role: z.enum(["user", "assistant"]),
-  content: z.string(),
-});
+import { MessageParam } from "@anthropic-ai/sdk/resources";
 
 export type Role = "user" | "assistant";
-
-export type TextMessage = z.infer<typeof textMessageSchema>;
 
 export default function Chat() {
   const [error, setError] = useState(false);
 
-  const [state, formAction, pending] = useActionState(async (prev: TextMessage[], formData: FormData) => {
+  const [state, formAction, pending] = useActionState(async (prev: MessageParam[], formData: FormData) => {
     const message = formData.get("message") as string; // NOTE: If this is ever empty, something has gone wrong.
     addOptimistic(message);
-    const conversation = [...prev, { role: "user", content: message }] as TextMessage[];
+    const conversation = [...prev, { role: "user", content: message }] as MessageParam[];
     try {
       const response = await callAgent(conversation);
       if (response === null) {
         setError(true);
         return prev;
       }
-      const text = response[0].text as string;
-      console.log(text);
-
-      conversation.push({ role: "assistant", content: text });
+      conversation.push({ content: response.content, role: "assistant" });
       return conversation;
     }
     catch (err) {
@@ -37,21 +27,27 @@ export default function Chat() {
       setError(true);
     }
     return prev;
-  }, [] as TextMessage[]);
+  }, [] as MessageParam[]);
 
   const [conversation, addOptimistic] = useOptimistic(
     state,
-    (curr: TextMessage[], msg: string) => {
-      return [...curr, { role: "user", content: msg }] as TextMessage[];
+    (curr: MessageParam[], msg: string) => {
+      return [...curr, { role: "user", content: msg }] as MessageParam[];
     },
   );
+  console.log(conversation);
 
   return (
     <div className="w-full h-full">
       <div>
-        {conversation.map((message, i) => message.role === "user"
-          ? <UserMessage text={message.content} key={i} />
-          : <BotMessage text={message.content} key={i} />)}
+        {conversation.flatMap((message) => {
+          if (typeof message.content === "string") {
+            return message;
+          }
+          return message.content.map(submessage => ({ role: "assistant", content: submessage.text })); // NOTE: this is a workaround
+        }).map((message, i) => message.role === "user"
+          ? <UserMessage text={message.content as string} key={i} />
+          : <BotMessage text={message.content as string} key={i} />)}
 
       </div>
       {pending && <p>Spinner</p>}
