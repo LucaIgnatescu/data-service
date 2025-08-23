@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useOptimistic, useState } from "react";
-import { callAgent } from "./actions";
+import { callAgent, generateSchema } from "./actions";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
 
 export type Role = "user" | "assistant";
@@ -14,7 +14,7 @@ export default function Chat() {
     addOptimistic(message);
     const conversation = [...prev, { role: "user", content: message }] as MessageParam[];
     try {
-      const response = await callAgent(conversation);
+      const response = await generateSchema(conversation);
       if (response === null) {
         setError(true);
         return prev;

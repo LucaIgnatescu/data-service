@@ -2,6 +2,8 @@ import { CheckIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { Select } from "radix-ui";
 import { ChangeEventHandler, useState } from "react";
 import { SQLColumnType, DBColumnInfo } from "@/lib/db/init";
+import { z } from "zod";
+import { ColumnListItem } from "./types";
 
 function SelectionItem({ value, text }: { value: string; text: string }) {
   return (
@@ -92,11 +94,6 @@ export function DBColumnInput({
 }
 
 export function DBColumns() {
-  type ColumnListItem = Omit<DBColumnInfo, "type"> & {
-    type: SQLColumnType | null;
-    index: number;
-  };
-
   const [counter, setCounter] = useState(0);
 
   const [dbColumns, setDbColumns] = useState<ColumnListItem[]>([]);
