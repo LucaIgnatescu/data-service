@@ -29,8 +29,6 @@ export async function generateSchema(conversation: MessageParam[]) {
       Your output must be a JSON array of column definitions following this exact specification:
       ${JSON.stringify(z.toJSONSchema(ColumnListItemSchema), null, 2)}
       
-      VALID SQL TYPES: INT, TEXT, REAL, BOOLEAN, DATE, TIMESTAMP, VARCHAR, DECIMAL, SERIAL, BIGINT, SMALLINT, JSON, JSONB, UUID
-      
       Example input: "Create a table for storing user information with id, username, age, bio, and balance"
       Example output:
       [
@@ -64,6 +62,7 @@ export async function generateSchema(conversation: MessageParam[]) {
   // TODO: Make actually work
   const data = response.content[0].text;
   const rawJson = JSON.parse(data);
+  console.log(rawJson);
 
   const parsed = ColumnListSchema.safeParse(rawJson);
 
