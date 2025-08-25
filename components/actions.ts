@@ -50,9 +50,11 @@ export async function generateSchema(conversation: MessageParam[]) {
       
       ERROR HANDLING:
       If the conversation above is unrelated to database schemas, output exactly:
-      [{ "name": "error", "type": "TEXT", "defaultValue": "Invalid request: The purpose of this conversation is to create database schemas", "index": 0 }]
+      [{ "name": "error", "type": "TEXT", "defaultValue": "Invalid request", "index": 0 }]
       
       Your response must start with [ and be valid JSON parseable by JSON.parse() without any preprocessing.
+
+      Prioritize the latest messages.
       ` }] as MessageParam[];
 
   const response = await callAgent(prompt);
