@@ -3,7 +3,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
 import { z } from "zod";
-import { ColumnListItemSchema } from "./types";
+import { ColumnListItemSchema, ColumnListSchema } from "./types";
 
 const anthropic = new Anthropic();
 
@@ -17,7 +17,6 @@ export async function callAgent(conversation: MessageParam[], system: string = "
   if (response === null) {
     return null;
   }
-  console.log(response);
   return { content: response.content };
 }
 
@@ -58,5 +57,17 @@ export async function generateSchema(conversation: MessageParam[]) {
       Your response must start with [ and be valid JSON parseable by JSON.parse() without any preprocessing.
       ` }] as MessageParam[];
 
-  return callAgent(prompt);
+  const response = await callAgent(prompt);
+  if (response === null) {
+    return null;
+  }
+  // TODO: Make actually work
+  const data = response.content[0].text;
+  const rawJson = JSON.parse(data);
+
+  const parsed = ColumnListSchema.safeParse(rawJson);
+
+  console.log(parsed);
+
+  return response;
 }

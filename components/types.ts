@@ -7,4 +7,8 @@ export const ColumnListItemSchema = z.object({
   index: z.number(),
 });
 
+export const ColumnListSchema = z.array(ColumnListItemSchema);
+
 export type ColumnListItem = z.infer<typeof ColumnListItemSchema>;
+
+export type ColumnList = z.infer<typeof ColumnListSchema>;
