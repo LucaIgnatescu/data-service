@@ -1,7 +1,7 @@
 "use server";
 
 import Anthropic from "@anthropic-ai/sdk";
-import { MessageParam } from "@anthropic-ai/sdk/resources";
+import { ContentBlock, MessageParam } from "@anthropic-ai/sdk/resources";
 import { z } from "zod";
 import { ColumnListItemSchema, ColumnListSchema } from "./types";
 
@@ -61,6 +61,7 @@ export async function generateSchema(conversation: MessageParam[]) {
   if (response === null) {
     return null;
   }
+
   // TODO: Make actually work
   const data = response.content[0].text;
   const rawJson = JSON.parse(data);
@@ -72,3 +73,13 @@ export async function generateSchema(conversation: MessageParam[]) {
 
   return response;
 }
+
+
+
+function validateAndParse(response: ContentBlock[]) {
+  if (response.length !== 1) {
+    return
+  }
+}
+
+

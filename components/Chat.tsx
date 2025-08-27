@@ -6,7 +6,7 @@ import { MessageParam } from "@anthropic-ai/sdk/resources";
 
 export type Role = "user" | "assistant";
 
-export default function Chat() {
+export default function Chat({ }) {
   const [error, setError] = useState(false);
 
   const [state, formAction, pending] = useActionState(async (prev: MessageParam[], formData: FormData) => {

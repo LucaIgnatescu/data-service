@@ -1,8 +1,7 @@
 import { CheckIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { Select } from "radix-ui";
 import { ChangeEventHandler, useState } from "react";
-import { SQLColumnType, DBColumnInfo } from "@/lib/db/init";
-import { z } from "zod";
+import { SQLColumnType } from "@/lib/db/init";
 import { ColumnListItem } from "./types";
 
 function SelectionItem({ value, text }: { value: string; text: string }) {
@@ -93,10 +92,15 @@ export function DBColumnInput({
   );
 }
 
-export function DBColumns() {
+export function DBColumns({
+  dbColumns,
+  setDbColumns,
+}: {
+  dbColumns: ColumnListItem[];
+  setDbColumns: (arg: ColumnListItem[]) => void;
+},
+) {
   const [counter, setCounter] = useState(0);
-
-  const [dbColumns, setDbColumns] = useState<ColumnListItem[]>([]);
 
   const addColumn = () => {
     const newColumn = {
@@ -145,7 +149,7 @@ export function DBColumns() {
       })}
       <button
         onClick={addColumn}
-        className="border rounded p-2 text-white hover:bg-neutral-600"
+        className="border rounded p-2 hover:bg-neutral-600"
       >
         Add Column
       </button>
