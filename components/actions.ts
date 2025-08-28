@@ -2,32 +2,33 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { ContentBlock, MessageParam } from "@anthropic-ai/sdk/resources";
-import { z } from "zod";
-import { ColumnListItemSchema, ColumnListSchema } from "./types";
-
+import { ColumnListItemSchema, ColumnListSchema, SchemaGenReponse, SchemaGenResponse } from "./types";
+import { Effect, Option, Either, pipe, JSONSchema, Exit, Schema, Match } from "effect";
 const anthropic = new Anthropic();
 
-export async function callAgent(conversation: MessageParam[], system: string = "") {
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 2048,
-    system,
-    messages: conversation,
+function callAgent(conversation: MessageParam[], system: string = "") {
+  return Effect.tryPromise({
+    try: async () => {
+      const response = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2048,
+        system,
+        messages: conversation,
+      });
+      if (response === null) {
+        throw new Error("Error retrieving response");
+      }
+      return response.content;
+    },
+    catch: () => new Error("Error retrieving respnose"),
   });
-  if (response === null) {
-    return null;
-  }
-  return { content: response.content };
 }
 
-export async function generateSchema(conversation: MessageParam[]) {
-  console.log(z.toJSONSchema(ColumnListItemSchema));
-  const prompt = [...conversation, {
-    role: "user", content: `
+const assemblePrompt = (schema: string) => `
       Based on the conversation above, generate a postgres schema that most closely matches the above description.
       
       Your output must be a JSON array of column definitions following this exact specification:
-      ${JSON.stringify(z.toJSONSchema(ColumnListItemSchema), null, 2)}
+      ${schema}
       
       Example input: "Create a table for storing user information with id, username, age, bio, and balance"
       Example output:
@@ -55,31 +56,54 @@ export async function generateSchema(conversation: MessageParam[]) {
       Your response must start with [ and be valid JSON parseable by JSON.parse() without any preprocessing.
 
       Prioritize the latest messages.
-      ` }] as MessageParam[];
+`;
 
-  const response = await callAgent(prompt);
-  if (response === null) {
-    return null;
-  }
+function generateSchema(conversation: MessageParam[]): Effect.Effect<ColumnListSchema, Error> {
+  const prompt = [...conversation, {
+    role: "user",
+    content: assemblePrompt(JSON.stringify(JSONSchema.make(ColumnListItemSchema), null, 2)),
+  }] as MessageParam[];
 
-  // TODO: Make actually work
-  const data = response.content[0].text;
-  const rawJson = JSON.parse(data);
-  console.log(rawJson);
-
-  const parsed = ColumnListSchema.safeParse(rawJson);
-
-  console.log(parsed);
-
-  return response;
+  return pipe(
+    prompt,
+    callAgent,
+    Effect.tap(console.log),
+    Effect.flatMap(validateAndParse),
+    Effect.flatMap((data: string) => Effect.try(() => JSON.parse(data) as object)),
+    Effect.tap(console.log),
+    Effect.andThen(Schema.decodeUnknown(ColumnListSchema)),
+  );
 }
 
-
-
-function validateAndParse(response: ContentBlock[]) {
+function validateAndParse(response: ContentBlock[]): Option.Option<string> {
   if (response.length !== 1) {
-    return
+    return Option.none();
   }
+
+  const textBlocks = response.filter(block => block.type === "text").map(block => block.text);
+
+  if (textBlocks.length !== response.length) {
+    return Option.none();
+  }
+
+  return Option.some(textBlocks.join(""));
 }
 
+export async function generateSchemaAction(conversation: MessageParam[]) {
+  const result = await Effect.runPromiseExit(generateSchema(conversation));
+  return Exit.match(result, {
+    onFailure: (err) => {
+      console.error(err);
+      return {
+        success: false,
+      };
+    },
 
+    onSuccess: (data: ColumnListSchema) => ({
+      success: true,
+      schema: data,
+
+    }),
+
+  }) as SchemaGenReponse;
+}

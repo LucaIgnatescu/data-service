@@ -1,8 +1,10 @@
 "use client";
 
 import { useActionState, useOptimistic, useState } from "react";
-import { callAgent, generateSchema } from "./actions";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
+import { generateSchemaAction } from "./actions";
+import { ColumnListSchema, SchemaGenSuccessResponse } from "./types";
+import { Schema } from "effect";
 
 export type Role = "user" | "assistant";
 
@@ -14,12 +16,14 @@ export default function Chat({ }) {
     addOptimistic(message);
     const conversation = [...prev, { role: "user", content: message }] as MessageParam[];
     try {
-      const response = await generateSchema(conversation);
-      if (response === null) {
+      const response = await generateSchemaAction(conversation);
+      if (response.success === false) {
         setError(true);
         return prev;
       }
-      conversation.push({ content: response.content, role: "assistant" });
+
+      const schema = (response as SchemaGenSuccessResponse).schema;
+      conversation.push({ content: JSON.stringify(Schema.encode(ColumnListSchema)(schema)), role: "assistant" });
       return conversation;
     }
     catch (err) {

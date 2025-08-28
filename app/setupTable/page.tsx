@@ -1,11 +1,11 @@
 "use client";
 import Chat from "@/components/Chat";
 import { DBColumns } from "@/components/client";
-import { ColumnListItem } from "@/components/types";
+import { ColumnListItemSchema } from "@/components/types";
 import { useState } from "react";
 
 export default function Page() {
-  const [dbColumns, setDbColumns] = useState<ColumnListItem[]>([]);
+  const [dbColumns, setDbColumns] = useState<ColumnListItemSchema[]>([]);
 
   return (
     <div className="h-screen w-full flex flex-row bg-stone-900">
