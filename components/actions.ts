@@ -15,12 +15,16 @@ function callAgent(conversation: MessageParam[], system: string = "") {
         system,
         messages: conversation,
       });
+      console.log("Raw Response:", response);
       if (response === null) {
         throw new Error("Error retrieving response");
       }
       return response.content;
     },
-    catch: () => new Error("Error retrieving respnose"),
+    catch: (err) => {
+      console.error(err);
+      return new Error("Error retrieving respnose");
+    },
   });
 }
 
@@ -67,10 +71,8 @@ function generateSchema(conversation: MessageParam[]): Effect.Effect<ColumnListS
   return pipe(
     prompt,
     callAgent,
-    Effect.tap(console.log),
     Effect.flatMap(validateAndParse),
     Effect.flatMap((data: string) => Effect.try(() => JSON.parse(data) as object)),
-    Effect.tap(console.log),
     Effect.andThen(Schema.decodeUnknown(ColumnListSchema)),
   );
 }
@@ -89,14 +91,14 @@ function validateAndParse(response: ContentBlock[]): Option.Option<string> {
   return Option.some(textBlocks.join(""));
 }
 
-export async function generateSchemaAction(conversation: MessageParam[]) {
+export async function generateSchemaAction(conversation: MessageParam[]): Promise<SchemaGenReponse> {
   const result = await Effect.runPromiseExit(generateSchema(conversation));
   return Exit.match(result, {
     onFailure: (err) => {
       console.error(err);
       return {
         success: false,
-      };
+      } as SchemaGenReponse;
     },
 
     onSuccess: (data: ColumnListSchema) => ({

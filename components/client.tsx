@@ -2,7 +2,7 @@ import { CheckIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { Select } from "radix-ui";
 import { ChangeEventHandler, useState } from "react";
 import { SQLColumnType } from "@/lib/db/init";
-import { ColumnListItemSchema } from "./types";
+import { ColumnListItemSchema, ColumnListSchema } from "./types";
 
 function SelectionItem({ value, text }: { value: string; text: string }) {
   return (
@@ -96,7 +96,7 @@ export function DBColumns({
   dbColumns,
   setDbColumns,
 }: {
-  dbColumns: ColumnListItemSchema[];
+  dbColumns: ColumnListSchema;
   setDbColumns: (arg: ColumnListItemSchema[]) => void;
 },
 ) {

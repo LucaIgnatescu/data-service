@@ -15,7 +15,8 @@ const eslintConfig = [
   stylistic.configs["disable-legacy"],
   stylistic.configs.customize({
     quotes: "double",
-    semi: true
+    semi: true,
+    "generator-star-spacing": false
   })
 ];
 
