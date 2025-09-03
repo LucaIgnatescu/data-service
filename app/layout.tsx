@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Courier_Prime } from "next/font/google";
 import "./globals.css";
+import GlobalEventManager from "@/components/GlobalEventManager";
 
 const courier = Courier_Prime({ subsets: ["latin"], weight: ["400", "700"] });
 
@@ -17,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${courier.className} bg-black text-neutral-400`}>
-        {children}
+        <GlobalEventManager>
+          {children}
+        </GlobalEventManager>
       </body>
     </html>
   );

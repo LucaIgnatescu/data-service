@@ -58,7 +58,7 @@ export default function ProjectForm({ onCancel, action }: ProjectFormProps) {
           </Label.Root>
           <p className="my-1">
             Outline the main goal of your project.
-            This description will be used by the AI model, so being descriptive helps.
+            This description will be used by the AI model, so being specific helps.
           </p>
           <AutoExpandingTextarea
             id="description"

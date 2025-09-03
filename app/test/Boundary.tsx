@@ -1,6 +1,6 @@
 "use client";
 
-import Chat from "@/components/Chat";
+import FileDrop from "@/components/FileDrop";
 export default function Boundary() {
-  return <Chat />;
+  return <FileDrop />;
 }
