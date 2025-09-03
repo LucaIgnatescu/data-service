@@ -1,65 +1,26 @@
 "use client";
 
 import { useActionState, useOptimistic, useState } from "react";
-import { MessageParam, TextBlock, TextBlockParam } from "@anthropic-ai/sdk/resources";
+import { MessageParam, TextBlockParam } from "@anthropic-ai/sdk/resources";
 import { generateSchemaAction } from "./actions";
-import { ColumnListSchema, SchemaGenReponse, SchemaGenSuccessResponse } from "./types";
-import { Effect, pipe, Schema } from "effect";
+import { ColumnListSchema, SchemaGenSuccessResponse } from "./types";
+import { Effect } from "effect";
 
 export type Role = "user" | "assistant";
-
-export const useConversation1 = () => {
-  const [error, setError] = useState(false);
-  const [state, formAction, pending] = useActionState(async (prev: MessageParam[], formData: FormData) => {
-    const message = formData.get("message") as string; // NOTE: If this is ever empty, something has gone wrong.
-    addOptimistic(message);
-    const conversation = [...prev, { role: "user", content: message }] as MessageParam[];
-    try {
-      const response = await generateSchemaAction(conversation);
-      if (response.success === false) {
-        setError(true);
-        return prev;
-      }
-
-      const schema = (response as SchemaGenSuccessResponse).schema;
-      conversation.push({ content: JSON.stringify(Schema.encode(ColumnListSchema)(schema)), role: "assistant" });
-      return conversation;
-    }
-    catch (err) {
-      console.error(err);
-      setError(true);
-    }
-    return prev;
-  }, [] as MessageParam[]);
-
-  const [conversation, addOptimistic] = useOptimistic(
-    state,
-    (curr: MessageParam[], msg: string) => {
-      return [...curr, { role: "user", content: msg }] as MessageParam[];
-    },
-  );
-  return { conversation, error, formAction, pending };
-};
 
 export type Message = {
   role: "user" | "assistant";
   content: Array<TextBlockParam>;
 };
 
-// manage conversation -> return conversation and data
-// what goes in?
-// how to map user data
-// how to get response
-// how to map response
-// relevant state
-
-export const useConversation = () => {
+export const useConversation = (setSchema: (schema: ColumnListSchema) => void) => {
   const [error, setError] = useState(false);
-  const [schema, setSchema] = useState<ColumnListSchema>([]);
   const stateFn = async (prev: Message[], formData: FormData): Promise<Message[]> => {
     const message = formData.get("message") as string;
-    addOptimistic({ role: "user", content: [{ type: "text", text: message }] } as Message);
+    const userMessage = { role: "user", content: [{ type: "text", text: message }] } as Message;
+    addOptimistic(userMessage);
 
+    const conversation = [...prev, userMessage];
     return await Effect.runPromise(
       Effect.gen(function*() {
         const data = yield* Effect.tryPromise(() =>
@@ -68,7 +29,7 @@ export const useConversation = () => {
 
         if (!data.success) {
           yield* Effect.sync(() => setError(true));
-          return yield* Effect.fail(new Error("operation Failed"));
+          yield* Effect.fail(new Error("operation Failed"));
         }
 
         return (data as SchemaGenSuccessResponse).schema as ColumnListSchema;
@@ -76,12 +37,12 @@ export const useConversation = () => {
         Effect.match({
           onFailure: () => {
             setError(true);
-            return prev;
+            return conversation;
           },
           onSuccess: (schema: ColumnListSchema) => {
             setSchema(schema);
             return [
-              ...prev,
+              ...conversation,
               {
                 role: "assistant",
                 content: [{ type: "text", text: JSON.stringify(schema) }],
@@ -98,7 +59,7 @@ export const useConversation = () => {
     (prev: Message[], message: Message) => [...prev, message],
   );
 
-  return { error, optimisticState, formAction, isPending, schema };
+  return { error, optimisticState, formAction, isPending };
 };
 
 export default function Chat(

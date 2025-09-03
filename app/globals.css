@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+@theme {
+  --slide-duration: 0.5s;
+  --slide-timing: ease-out;
+
+  --animate-slide-in: slide-in var(--slide-duration) var(--slide-timing) 1;
+  --animate-fade-in: fade-in var(--slide-duration) var(--slide-timing) 1;
+
+  @keyframes slide-in {
+    from {
+      transform: translatex(100%);
+    }
+    to {
+      transform: translatex(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity:0;
+    }
+  }
+
+}

@@ -54,11 +54,6 @@ export function ColumnType({ onValueChange, className }: { onValueChange: (arg0:
   );
 }
 
-type DBColumnInputProps = {
-  onValueChange: (arg0: string) => void;
-  onInputChange: ChangeEventHandler<HTMLInputElement>;
-};
-
 export function DBColumnInput({
   onValueChange,
   onDefaultValueChange,
@@ -97,9 +92,10 @@ export function DBColumns({
   setDbColumns,
 }: {
   dbColumns: ColumnListSchema;
-  setDbColumns: (arg: ColumnListItemSchema[]) => void;
+  setDbColumns: (arg: ColumnListSchema) => void;
 },
 ) {
+  console.log(dbColumns);
   const [counter, setCounter] = useState(0);
 
   const addColumn = () => {

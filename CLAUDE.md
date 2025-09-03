@@ -57,3 +57,5 @@ This is a Next.js 15 application using the App Router architecture with the foll
 - Use natural language to write them.
 - Present results in a user friendly way. 
 - Use double quotes for strings
+- Don't use regular image tags. Use next image.
+- If there is a radix ui component that fits in the context, use it.

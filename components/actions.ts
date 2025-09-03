@@ -92,6 +92,7 @@ function validateAndParse(response: ContentBlock[]): Option.Option<string> {
 }
 
 export async function generateSchemaAction(conversation: MessageParam[]): Promise<SchemaGenReponse> {
+  console.log(conversation);
   const result = await Effect.runPromiseExit(generateSchema(conversation));
   return Exit.match(result, {
     onFailure: (err) => {
