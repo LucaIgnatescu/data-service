@@ -14,10 +14,16 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   stylistic.configs["disable-legacy"],
   stylistic.configs.customize({
-    quotes: "double",
-    semi: true,
-    "generator-star-spacing": false
-  })
+    "quotes": "double",
+    "semi": true,
+    "generator-star-spacing": false,
+
+  }),
+  {
+    rules: {
+      "@stylistic/indent": "off"
+    }
+  }
 ];
 
 export default eslintConfig;

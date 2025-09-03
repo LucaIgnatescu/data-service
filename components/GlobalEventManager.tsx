@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-export default function GlobalEventManager({ children, className }: { children?: React.ReactNode; className?: string }) {
+export default function GlobalEventManager({ children }: { children?: React.ReactNode }) {
   useEffect(() => {
     const preventDefault = (e: DragEvent) => {
       e.preventDefault();
